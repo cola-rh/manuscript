@@ -29,18 +29,18 @@ mat = adjust_matrix(mat)
 
 ### perform hierarchical partitioning
 set.seed(123)
-if(file.exists("PBMC_cola_hierarchical_partition.rds")) {
-	rh = readRDS("PBMC_cola_hierarchical_partition.rds")
-	res = readRDS("PBMC_cola_consensus_partition.rds")
+if(file.exists("~/workspace/cola_hc/PBMC_cola_hierarchical_partition.rds")) {
+	rh = readRDS("~/workspace/cola_hc/PBMC_cola_hierarchical_partition.rds")
+	res = readRDS("~/workspace/cola_hc/PBMC_cola_consensus_partition.rds")
 } else {
 	rh = hierarchical_partition(mat, subset = 500, cores = 4,
 		anno = data.frame(Seurat_class = Seurat_class), anno_col = Seurat_col,
 		min_n_signatures = 200)
-	saveRDS(rh, file = "PBMC_cola_hierarchical_partition.rds")
+	saveRDS(rh, file = "~/workspace/cola_hc/PBMC_cola_hierarchical_partition.rds")
 
 	res = consensus_partition_by_down_sampling(mat, subset = 500, cores = 4, max_k = 10,
 		anno = data.frame(Seurat_class = Seurat_class), anno_col = Seurat_col)
-	saveRDS(res, file = "PBMC_cola_consensus_partition.rds")
+	saveRDS(res, file = "~/workspace/cola_hc/PBMC_cola_consensus_partition.rds")
 }
 
 cola_cl = get_classes(res, k = 4)[, 1]

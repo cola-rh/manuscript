@@ -169,11 +169,11 @@ make_correspondance = function(tb, which = "tumor_type", plot = "heatmap") {
             }
         }
 
-        grid.rect(y = cum1, x = unit(0.2, "native") - ifelse(seq_along(cm1) %% 2 == 1, 1, 0)*unit(3, "mm"), height = w1, width = unit(3, "mm"), just = c("right", "top"), default.units = "native",
+        grid.rect(y = cum1, x = unit(0.2, "native") - ifelse(seq_along(cum1) %% 2 == 1, 1, 0)*unit(3, "mm"), height = w1, width = unit(3, "mm"), just = c("right", "top"), default.units = "native",
             gp = gpar(fill = col[rownames(foo)], col = NA))
         grid.text(ifelse(which == "tumor_type", "Tumor types", "Methylation classes"), x = unit(0.2, "native") - unit(10, "mm"), y = 0.5, rot = 90, just = "bottom")
     
-        grid.rect(y = cum2, x = unit(0.8) + ifelse(seq_along(cm1) %% 2 == 1, 1, 0)*unit(3, "mm"), height = w2, width = unit(3, "mm"), just = c("left", "top"), default.units = "native",
+        grid.rect(y = cum2, x = unit(0.8, "native") + ifelse(seq_along(cum1) %% 2 == 1, 1, 0)*unit(3, "mm"), height = w2, width = unit(3, "mm"), just = c("left", "top"), default.units = "native",
             gp = gpar(fill = rh@subgroup_col[colnames(foo)], col = NA))
         grid.text("cola HCP classification", x = unit(0.8, "native") + unit(10, "mm"), y = 0.5, rot = 90, just = "top")
     }
