@@ -195,5 +195,18 @@ plot_grid(p1, p2, plot_grid(p3, p4, ncol = 1, rel_heights = c(1, 3)), nrow = 1, 
 dev.off()
 
 
-### how the error accumulated when the hierarchy gets deeper
+library(matrixStats)
+overall_classification_agreement = function(x, y) {
+    m = overlap_coefficient(x, y)
+
+    tb1 = table(x)
+    v = rowMaxs(m)
+    names(v) = rownames(m)
+    v = v[names(tb1)]
+    sum(v*tb1)/sum(tb1)
+}
+
+overall_classification_agreement(tb$cola_class, tb$tumor_type)
+overall_classification_agreement(tb$cola_class, tb$meth_class)
+
 

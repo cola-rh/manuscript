@@ -153,7 +153,7 @@ library(GetoptLong)
 library(gh)
 
 username = "cola-rh"
-token = 
+token = "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"
 
 delete_repo = function(repo, dir, where = c("remote", "local")) {
 	qqcat("delete repo @{repo}\n")

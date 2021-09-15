@@ -189,3 +189,5 @@ for(i in 1:19) {
 }
 
 
+# function `overall_classification_agreement()` is from figure6.R
+overall_classification_agreement(tb$cola_class, tb$Seurat_class)
