@@ -34,8 +34,7 @@ if(file.exists("~/workspace/cola_hc/PBMC_cola_hierarchical_partition.rds")) {
 	res = readRDS("~/workspace/cola_hc/PBMC_cola_consensus_partition.rds")
 } else {
 	rh = hierarchical_partition(mat, subset = 500, cores = 4,
-		anno = data.frame(Seurat_class = Seurat_class), anno_col = Seurat_col,
-		min_n_signatures = 200)
+		anno = data.frame(Seurat_class = Seurat_class), anno_col = Seurat_col)
 	saveRDS(rh, file = "~/workspace/cola_hc/PBMC_cola_hierarchical_partition.rds")
 
 	res = consensus_partition_by_down_sampling(mat, subset = 500, cores = 4, max_k = 10,
@@ -68,21 +67,30 @@ p3 = ~{
 
 
 ### signature heatmap
+set.seed(123)
 sig_tb = get_signatures(rh, plot = FALSE)
+
+library(SingleR)
+library(celldex)
+hpca.se <- HumanPrimaryCellAtlasData()
+pred <- SingleR(test = mat, ref = hpca.se, assay.type.test=1, labels = hpca.se$label.main)
+cell_type = pred$labels
+
+cell_type_tb = table(cell_type)
+cell_type[cell_type %in% names(which(cell_type_tb < 25))] = "Others"
+cell_type_col = structure(c(2:5, 1), names = c("T_cells",  "B_cell",   "Monocyte", "NK_cell",  "Others"))
 
 cl = get_classes(rh)
 ht = Heatmap(t(scale(t(mat[sig_tb$which_row, ]))), name = "Z-score", column_title = qq("@{length(unique(cl))} groups, @{nrow(sig_tb)} signatures under FDR < 0.05"),
 	col = colorRamp2(c(-2, 0, 2), c("green", "white", "red")),
-	top_annotation = HeatmapAnnotation(Class = cl, col = list(Class = rh@subgroup_col),
-		annotation_legend_param = list(Class = list(ncol = 2))),
-	bottom_annotation = HeatmapAnnotation(Seurat_class = Seurat_class, cola_4_groups = cola_cl,
-		col = list(Seurat_class = Seurat_col, cola_4_groups = cola_opt$color_set_2),
-		annotation_legend_param = list(Seurat_class = list(ncol = 2), cola_4_groups = list(ncol = 2))),
+	top_annotation = HeatmapAnnotation(Class = cl, col = list(Class = rh@subgroup_col)),
+	bottom_annotation = HeatmapAnnotation(Seurat_class = Seurat_class, cola_4_groups = cola_cl, cell_type = cell_type,
+		col = list(Seurat_class = Seurat_col, cola_4_groups = cola_opt$color_set_2, cell_type = cell_type_col)),
 	show_row_names = FALSE, show_column_names = FALSE, show_row_dend = FALSE,
 	cluster_columns = cola:::calc_dend(rh, mat = mat), 
 	column_split = length(unique(cl)), row_km = 7, row_title = paste0("km", 1:7), row_title_rot = 0
 )
-p4 = grid.grabExpr(ht <- draw(ht, merge_legend = TRUE))
+p4 = grid.grabExpr(ht <- draw(ht, merge_legend = TRUE), height = 5)
 
 ### stability
 
@@ -170,9 +178,9 @@ p_agreement = grid.grabExpr({
 library(cowplot)
 
 pdf("figure5.pdf", width = 14, height = 10)
-plot_grid( plot_grid(p1, p2, p3, nrow = 1), 
+print(plot_grid( plot_grid(p1, p2, p3, nrow = 1), 
 	plot_grid(p_agreement, p4, p_stability, rectGrob(gp = gpar(fill = NA, col = NA)), 
-		nrow = 1, rel_widths = c(1.5, 2, 0.6, 1)), rel_heights = c(1, 1.2), nrow = 2)
+		nrow = 1, rel_widths = c(1.5, 2, 0.6, 1)), rel_heights = c(1, 1.2), nrow = 2))
 dev.off()
 
 
@@ -191,3 +199,5 @@ for(i in 1:19) {
 
 # function `overall_classification_agreement()` is from figure6.R
 overall_classification_agreement(tb$cola_class, tb$Seurat_class)
+
+

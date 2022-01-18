@@ -88,6 +88,8 @@ for(i in seq_along(ind)) {
 
 	code = gsub("\\t", "    ", code)
 
+	code = c("set.seed(123)", code)
+
 	if(!any(grepl("cola_report", code))) {
 		code= c(code, qq("cola_report(rh, output = \"@{name}_cola_rh_report\", title = \"cola Report for Hierarchical Partitioning - '@{name}'\")"))
 	}
@@ -129,8 +131,8 @@ for(i in seq_along(examples)) {
 
 	code = examples[[i]]$code
 		
-	if(any(grepl("[A-Z]\\w+Data\\(", code))) {
-		i = which(grepl("[A-Z]\\w+Data\\(", code))
+	if(any(grepl("[A-Z]\\w+Data\\(\\)", code))) {
+		i = which(grepl("[A-Z]\\w+Data\\(\\)", code))
 		code[i] = qq("data = readRDS('@{base_dir}/@{name}/@{name}_data.rds')")
 		writeLines(code, con = qq("@{base_dir}/@{name}/@{name}_cola_rh.R"))
 	} else {
@@ -145,7 +147,7 @@ for(i in seq_along(examples)) {
 	name = examples[[i]]$name
 	if(name == "") next
 
-	bsub_script(qq("@{base_dir}/@{name}/@{name}_cola_rh.R"), name = qq("cola_rh_@{name}"), hour = 20, memory = 60, core = 4, enforce = F)
+	bsub_script(qq("@{base_dir}/@{name}/@{name}_cola_rh.R"), name = qq("cola_rh_@{name}"), hour = 20, memory = 60, core = 4, enforce = T)
 }
 
 ############## host on github ################
@@ -153,7 +155,7 @@ library(GetoptLong)
 library(gh)
 
 username = "cola-rh"
-token = "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"
+token = 
 
 delete_repo = function(repo, dir, where = c("remote", "local")) {
 	qqcat("delete repo @{repo}\n")
